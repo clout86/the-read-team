@@ -8,6 +8,11 @@ need love2d, and
 local http = require("socket.http")
 local ltn12 = require("ltn12")
 local json = require("dkjson")
+
+and for the metasploit module:
+ 
+local mp = require("MessagePack")
+
 ```
 
 there is also an optional sql-dep that is burried, but that function needs updating anyhow.
