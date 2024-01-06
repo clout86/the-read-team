@@ -4,6 +4,15 @@ trial at your own err
 
 need love2d, and 
 
+
+
+a general research project for and inspired by:
+https://github.com/notnullgames/pakemon-demos
+
+Planet asset from, really fun stuff! 
+https://deep-fold.itch.io/pixel-planet-generator
+
+
 ```
 local http = require("socket.http")
 local ltn12 = require("ltn12")
@@ -34,8 +43,16 @@ over-reaching goals of the project; our praxis:
 
     Feedback System: Implement a feedback mechanism that informs users of the success or failure of their actions, what went wrong if there was an error, and how to correct it.
 
+
+
+
     Community and Support: Develop a community support system where users can share experiences, help each other out, and contribute to the project.
 
     Gamification: Introduce elements like scoring, badges, or levels to motivate users and track their progress.
 
     Responsibility and Ethics: Teach users about the ethical use of hacking tools and the importance of permission and legality in penetration testing.
+
+```
+
+
+
