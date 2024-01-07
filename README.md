@@ -55,4 +55,84 @@ over-reaching goals of the project; our praxis:
 ```
 
 
+There is a pretty big waring in that the docker-compose.yaml in aTools, and tools as some nasty bugs to explore so be careful! 
+This docker set-up is from the https://github.com/notnullgames/pakemon-demos project
+
+
+
+`` `
+version: "3.5"
+
+services:
+    
+    # this gives you a CLI to interrogate
+    haxor:
+       image: kalilinux/kali-rolling
+       tty: true
+       networks:
+           - pakemon
+       ports:
+           - 55552:55552
+
+    bettercap:
+        image: bettercap/bettercap
+        tty: true
+        stdin_open: true
+        networks:
+            - pakemon
+        ports:
+            - 8080:8080
+            - 8081:8081
+        volumes:
+            - ./pakemon.cap:/app/pakemon.cap
+        command: -caplet pakemon
+
+    # these are targets:
+    nowasp:
+        image: citizenstig/nowasp
+        hostname: nowasp
+        networks:
+            - pakemon
+    
+    webgoat:
+        image: webgoat/webgoat-7.1
+        hostname: webgoat
+        networks:
+            - pakemon
+    
+    dvwa:
+        image: citizenstig/dvwa
+        hostname: dvwa
+        networks:
+            - pakemon
+    
+    securityshepherd:
+        image: ismisepaul/securityshepherd
+        hostname: securityshepherd
+        networks:
+            - pakemon
+
+    vaas-cve-2014-0160:
+        image: hmlio/vaas-cve-2014-0160
+        hostname: vaas-cve-2014-0160
+        networks:
+            - pakemon
+    cve-2017-7494:
+        image: vulnerables/cve-2017-7494
+        hostname: cve-2017-7494
+        networks:
+            - pakemon
+    vaas-cve-2014-6271:
+        image: hmlio/vaas-cve-2014-6271
+        hostname: vaas-cve-2014-6271
+        networks:
+            - pakemon
+
+# careful, this is a war-zone :)
+networks:
+    pakemon:
+        name: pakemon
+```
+
+
 
