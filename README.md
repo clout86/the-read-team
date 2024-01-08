@@ -55,7 +55,7 @@ over-reaching goals of the project; our praxis:
 ```
 
 
-There is a pretty big waring in that the docker-compose.yaml in aTools, and tools as some nasty bugs to explore so be careful! 
+There is a pretty big warning in that the docker-compose.yaml in aTools, and tools has some nasty bugs to explore so be careful! 
 This docker set-up is from the https://github.com/notnullgames/pakemon-demos project
 
 
