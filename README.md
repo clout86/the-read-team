@@ -21,6 +21,12 @@ and for the metasploit module:
 local mp = require("MessagePack")
 
 ```
+# To run:
+``` 
+cd planet_rendor/tools && docker-compose up
+cd ../aTools docker-compose run --services-ports haxor #(on haxor host; run: `sh /app/run_in_haxor.sh
+cd planet_rendor && love .
+```
 
 ## Navigation
 ```
