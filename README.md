@@ -1,10 +1,5 @@
-Not ready for release. 
 
-trial at your own err
-
-need love2d, and 
-
-
+# Not ready for release. 
 
 a general research project for and inspired by:
 https://github.com/notnullgames/pakemon-demos
@@ -12,19 +7,30 @@ https://github.com/notnullgames/pakemon-demos
 Planet asset from, really fun stuff! 
 https://deep-fold.itch.io/pixel-planet-generator
 
+trial at your own err
 
+# lib requirements 
+need love2d, and 
 ```
-local http = require("socket.http")
+local http = require("socket.http") -- LuaSockets?
 local ltn12 = require("ltn12")
 local json = require("dkjson")
+local json = require("json") -- I think this can be just be swapped for dkjson, but need to test  it
 
-and for the metasploit module:
- 
+and for the metasploit module: 
 local mp = require("MessagePack")
 
 ```
 
-there is also an optional sql-dep that is burried, but that function needs updating anyhow.
+## Navigation
+```
+    Press the a key to navigate planets,
+    Up and Down to Navigate
+    Press a for menu, and a to select option
+```
+
+# some general warnings and infos 
+there is also an optional sql-dep that is yanked, that function needs updating anyhow.
 
 if you're not running it on the test net... well somethings are "hard coded" via variables to the docker test-net right now.
 
