@@ -4,12 +4,15 @@ services:
     
     # this gives you a CLI to interrogate
     haxor:
-       image: kalilinux/kali-rolling
-       tty: true
-       networks:
+        image: kalilinux/kali-rolling
+        tty: true
+        networks:
            - pakemon
-       ports:
+        ports:
            - 55552:55552
+        volumes:
+           - ./run_in_haxor.sh:/app/run_in_haxor.sh
+          # command: /app/run_in_haxor.sh
 
     bettercap:
         image: bettercap/bettercap
