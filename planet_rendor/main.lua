@@ -1,5 +1,5 @@
 -- No matter where you go, everyone's conneted. -- Lain Iwakura; Serial Experiments Lain
--- Do not, under any circumstances, depend on a partial feeling. -- Miyaoto Musashi
+-- Do not, under any circumstances, depend on a partial feeling. -- Miyamoto Musashi
 
 -- Hack the planet
 -- just one more line for good measure
