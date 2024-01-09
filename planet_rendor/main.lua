@@ -1,3 +1,9 @@
+-- No matter where you go, everyone's conneted. -- Lain Iwakura; Serial Experiments Lain
+-- Do not, under any circumstances, depend on a partial feeling. -- Miyaoto Musashi
+
+-- Hack the planet
+-- just one more line for good measure  
+
 local http = require("socket.http")
 local ltn12 = require("ltn12")
 local json = require("dkjson")
@@ -8,7 +14,6 @@ local authenticate = require("auth")
 local url = "http://localhost:55552/api/1.0"
 local username = "msf"
 local password = "badpass"
-
 
 -- Authenticate and get the token
 local token = authenticate(url, username, password)
@@ -213,7 +218,7 @@ function love.update(dt)
 
 --  DEBUG STUFF
     require("lovebird").update()	
-    require("lurker").update() -- breaks UI placement       
+    require("lurker").update() -- breaks UI placement sometimes?       
 --  END DEBUG STUFF
 
     -- main start of update func
@@ -264,7 +269,6 @@ function net_probe_off()
         updateMessage("Error occurred: " .. tostring(commandResponse))  -- Display error
     end
 end
-
 
 function is_known_pipename(rhost)
     print("Executing is_known_pipename for:", rhost)
@@ -498,6 +502,7 @@ function love.keypressed(key)
         end
     end
 end
+
 function drawDetailsBox(selectedPlanet)
     if not selectedPlanet then
         return
@@ -599,10 +604,9 @@ function love.draw()
         local planet = planets[i]
         local planetX, planetY = calculateEllipticalOrbit(planet.semiMajorAxis, planet.eccentricity, planet.angle, 335)
         love.graphics.draw(planetSprite, sunX + planetX, sunY + planetY, 0, 0.1, 0.1, planetSprite:getWidth() / 2, planetSprite:getHeight() / 2)
-        local textX = sunX + planetX - planetSprite:getWidth() + 296  -- text placemnet for hostname to follow planets orbit
+        local textX = sunX + planetX - planetSprite:getWidth() + 296  -- text placemnet for hostname to follow planets orbit 
         local textY = sunY + planetY - planetSprite:getHeight() / 6 + 30
         love.graphics.print(planet.hostname, textX, textY)
-
 
         -- place to draw connected planet/hosts??b
 
@@ -615,7 +619,7 @@ function love.draw()
         end
     end
 
-  -- Message window
+    -- Message window
     if messageWindowTimer > 0 then
         love.graphics.setColor(0, 255, 255, 0.65)  -- semi-transparent cyan
         love.graphics.rectangle("fill", messageWindow.x, messageWindow.y, messageWindow.width, messageWindow.height)
@@ -659,4 +663,3 @@ function love.draw()
         end
     end
 end
-
