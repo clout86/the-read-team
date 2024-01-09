@@ -2,7 +2,8 @@
 -- Do not, under any circumstances, depend on a partial feeling. -- Miyaoto Musashi
 
 -- Hack the planet
--- just one more line for good measure  
+-- just one more line for good measure
+--
 
 local http = require("socket.http")
 local ltn12 = require("ltn12")
