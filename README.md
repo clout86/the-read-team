@@ -15,7 +15,7 @@ need love2d, and
 local http = require("socket.http") -- LuaSockets?
 local ltn12 = require("ltn12")
 local json = require("dkjson")
-local json = require("json") -- I think this can be just be swapped for dkjson, but need to test  it
+local json = require("json") -- I think this can just be swapped for dkjson, but need to test  it
 
 and for the metasploit module: 
 local mp = require("MessagePack")
