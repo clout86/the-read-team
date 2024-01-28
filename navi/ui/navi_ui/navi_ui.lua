@@ -22,294 +22,6 @@ local camera = Camera(love.graphics.getWidth() / 2, love.graphics.getHeight() / 
 
 navi_ui = {}
 
--- for option selection
-local isEditing = false
-
--- we should do a state stack instead of the way we handle "(b)ack" in the keypressed function
-
--- set value
-
-navi_ui.ui_option_data = {
-    name = "",
-    description = "",
-    references = {},
-    options = {}
-}
-
--- set the main state
-
-function navi_ui.clearOptions()
-    navi_ui.ui_option_data.options = {}
-    navi_ui.ui_option_data.optionKeys = {}
-end
-
--- Helper function to get the number of options for navigation purposes
-function navi_ui.getOptionCount()
-    local count = 0
-    for _ in pairs(navi_ui.ui_option_data.options) do
-        count = count + 1
-    end
-    return count
-end
-
-function navi_ui.populateMenuItems()
-    local startItem = (currentPage - 1) * itemsPerPage + 1
-    local endItem = math.min(startItem + itemsPerPage - 1, #allExploits)
-    menuItems = {}
-    for i = startItem, endItem do
-        table.insert(menuItems, allExploits[i])
-    end
-end
-
-function navi_ui.getOptionKeys()
-    local keys = {}
-    for k in pairs(navi_ui.ui_option_data.options) do
-        table.insert(keys, k)
-    end
-    table.sort(keys) -- Sort the keys to ensure consistent navigation order
-    return keys
-end
-
--- UI state variables
-local selectedOptionIndex = 1
-local scrollOffset = 0
-local maxOptionsOnScreen = 10
--- Helper function to get the number of options for navigation purposes
-function navi_ui.getOptionCount()
-    local count = 0
-    for _ in pairs(navi_ui.ui_option_data.options) do
-        count = count + 1
-    end
-    return count
-end
-
--- Adjusts the scroll offset based on navigation
-function navi_ui.adjustScrollOffset(direction)
-    if direction > 0 and selectedOptionIndex > scrollOffset + maxOptionsOnScreen then
-        scrollOffset = scrollOffset + 1
-    elseif direction < 0 and selectedOptionIndex < scrollOffset + 1 then
-        scrollOffset = scrollOffset - 1
-    end
-end
-
-function navi_ui.toggleOrSelectOption()
-    local optionKeys = navi_ui.getOptionKeys()
-    local currentOptionKey = optionKeys[selectedOptionIndex]
-    local currentOption = navi_ui.ui_option_data.options[currentOptionKey]
-
-    -- Call the handler for the specific option type
-    local handler = optionHandler[currentOption.type]
-    if handler then
-        handler(currentOptionKey, currentOption, "edit")
-    else
-        print("No handler for option type:", currentOption.type)
-    end
-
-    -- Update the navi_ui.ui_option_data table with the new value
-    navi_ui.ui_option_data.options[currentOptionKey].value = currentOption.value
-    updateTalkieMsfOptionDesc()
-end
-
-function navi_ui.navigateGirdRight()
-    if selectedItem < #menuItems then
-        selectedItem = selectedItem + 1
-    elseif currentPage < totalPages then
-        currentPage = currentPage + 1
-        selectedItem = 1
-        populateMenuItems() -- Repopulate menu items for the new page
-    end
-end
-
-function navi_ui.navigateGridLeft()
-    if selectedItem > 1 then
-        selectedItem = selectedItem - 1
-    elseif currentPage > 1 then
-        currentPage = currentPage - 1
-        selectedItem = itemsPerPage -- Set to the last item of the previous page
-        populateMenuItems() -- Repopulate menu items for the new page
-    end
-end
-
-function navi_ui.navigateGridDown()
-    local potentialNextItem = selectedItem + cols
-    -- Check if the potential next item is still on the current page
-    if potentialNextItem <= #menuItems then
-        selectedItem = potentialNextItem
-    end
-    -- If the potential next item would go past the end of the list, loop back to the top
-    if potentialNextItem > itemsPerPage then
-        selectedItem = selectedItem - itemsPerPage
-    end
-end
-
-function navi_ui.navigateGridUp()
-    local potentialPrevItem = selectedItem - cols
-    -- Check if the potential previous item is still on the current page
-    if potentialPrevItem >= 1 then
-        selectedItem = potentialPrevItem
-    end
-    -- If the potential previous item would go before the start of the list, loop to the bottom
-    if potentialPrevItem < 1 then
-        selectedItem = selectedItem + itemsPerPage
-        if selectedItem > #menuItems then
-            selectedItem = #menuItems
-        end
-    end
-end
-
--- Navigates up in the options list
-function navi_ui.navigateOptionsUp()
-    if selectedOptionIndex > 1 then
-        selectedOptionIndex = selectedOptionIndex - 1
-        adjustScrollOffset(-1)
-    end
-end
-
--- Navigates down in the options list
-function navi_ui.navigateOptionsDown()
-    if selectedOptionIndex < getOptionCount() then
-        selectedOptionIndex = selectedOptionIndex + 1
-        adjustScrollOffset(1)
-    end
-end
-
-function navi_ui.getColumnOfSelectedItem(selectedItem, cols)
-    return (selectedItem - 1) % cols + 1
-end
-
-function navi_ui.getNextPage(currentPage, itemsPerPage)
-    local newPage = currentPage + 1
-    local newSelectedItem = (newPage - 1) * itemsPerPage + 1
-    return newPage, newSelectedItem
-end
-
-function navi_ui.resetToFirstPage()
-    return 1, 1
-end
-
-function navi_ui.getPreviousPage(currentPage, itemsPerPage, cols)
-    local newPage = currentPage - 1
-    local newSelectedItem = newPage * itemsPerPage - (cols - 1)
-    return newPage, newSelectedItem
-end
-
-function navi_ui.resetToLastPage(totalPages, totalItems, cols)
-    local newPage = totalPages
-    local newSelectedItem = totalItems - (cols - 1)
-    return newPage, newSelectedItem
-end
-
-function navi_ui.isItemInCurrentPage(itemIndex, currentPage, itemsPerPage, totalItems)
-    local startIndex = (currentPage - 1) * itemsPerPage + 1
-    local endIndex = math.min(startIndex + itemsPerPage - 1, totalItems)
-    return itemIndex >= startIndex and itemIndex <= endIndex
-end
-
--- Enters editing mode for the selected option or confirms an action
-function navi_ui.enterOrConfirmOption()
-    local currentOptionKey = navi_ui.getOptionKeys()[selectedOptionIndex]
-    local currentOption = navi_ui.ui_option_data.options[currentOptionKey]
-    local handler = optionHandler[currentOption.type]
-    if handler then
-        handler(currentOptionKey, currentOption, "edit")
-    end
-end
-
--- Exits editing mode or goes back to the previous menu
-function navi_ui.exitEditingOrGoBack()
-    if currentState == uiElements.EDITING_OPTION or currentState == uiElements.KEYBOARD_INPUT then
-        currentState = uiElements.MSF_OPTIONS
-    else
-        popState()
-    end
-end
-
-function navi_ui.drawOptions()
-    -- conext of DropdownMenu
-    local currentSelection = 1
-    local inDropdown = false
-    local currentDropdownSelection = 1
-
-    -- option state navigation variables
-    local selectedOptionIndex = 1
-    local scrollOffset = 0
-    local maxOptionsOnScreen = 10
-
-    local baseY = 50
-    local optionKeys = navi_ui.getOptionKeys()
-    for i, optionKey in ipairs(optionKeys) do
-        local optionData = navi_ui.ui_option_data.options[optionKey]
-        if i > scrollOffset and i <= scrollOffset + maxOptionsOnScreen then
-            local y = baseY + (i - scrollOffset - 1) * 20
-            love.graphics.rectangle("line", 50, y, 200, 20)
-            local displayText = optionKey
-            local optionValue = tostring(optionData.value) or "No description available" -- Corrected line
-            love.graphics.setColor(0, 255, 0)
-            love.graphics.print(displayText, 60, y)
-            love.graphics.print(optionValue, 255, y) -- Corrected line
-
-            -- Highlight selected option
-            if i == selectedOptionIndex then
-                love.graphics.setColor(1, 1, 255)
-                love.graphics.rectangle("line", 50, y, 200, 20)
-                if currentState == uiElements.KEYBOARD_INPUT then
-                    keyboard.draw(255, y - 5) -- should be next to the option or something else
-                end
-            end
-            if currentState == uiElements.EDITING_OPTION then
-                local currentOption = navi_ui.ui_option_data.options[navi_ui.getOptionKeys()[selectedOptionIndex]]
-                if currentOption.type == "enum" then
-                    DropdownMenu.draw() -- Draw the DropdownMenu for enum options
-                end
-            end
-            -- If an option is selected, draw its value and description in a dedicated column
-
-            love.graphics.setColor(0, 255, 255)
-        end
-    end
-end
-
-function navi_ui.girdMenu(startX, startY)
-    -- Pagination for grid menu
-    local itemsPerPage = 9
-    local currentPage = 1
-    local totalPages
-    local allExploits = {} -- Store all exploit infos here
-    local menuItems = {} -- Items for the current page
-    local rows = 9
-    local cols = 9
-    local cellWidth = 100
-    local cellHeight = 50
-    local selectedItem = 1
-
-    -- Determine the number of items in the last row for proper centering
-    local itemsInLastRow = #menuItems % cols
-    if itemsInLastRow == 0 and #menuItems > 0 then
-        itemsInLastRow = cols -- If the last row is full, we use the maximum number of columns
-    end
-
-    -- Use the provided startX and startY as the starting position for the grid
-    local gridStartX = startX
-    local gridStartY = startY
-    for i, item in ipairs(menuItems) do
-        local col = ((i - 1) % cols) + 1
-        local row = math.floor((i - 1) / cols) + 1
-        local x = gridStartX + (col - 1) * cellWidth
-        local y = gridStartY + (row - 1) * cellHeight
-
-        -- Set the color for the selected or unselected item
-        love.graphics.setColor(i == selectedItem and {1, 0, 0} or {0, 1, 1})
-        love.graphics.rectangle("fill", x, y, cellWidth, cellHeight)
-
-        -- Set the color for the text and print the item's name
-        love.graphics.setColor(0, 0, 0)
-        love.graphics.print(item.name, x + 10, y + cellHeight / 2 - 7)
-    end
-end
-
-
-
-
 
 -- Menu and selection variables
 local selectedPlanetIndex = 1 -- Default selected planet index
@@ -668,6 +380,8 @@ function  navi_ui.detailsBox(selectedPlanet)
     love.graphics.line(boxX + boxWidth / 2, boxY + boxHeight, screenPlanetX, screenPlanetY)
 end
 
+
+
 function navi_ui.toggleLanVisibility()
     isLanVisible = not isLanVisible
 end
@@ -679,8 +393,6 @@ end
 function navi_ui.hideLan()
     isLanVisible = false
 end
-
-
 
 function  navi_ui.drawLan()
     if not isLanVisible then
@@ -727,10 +439,8 @@ function  navi_ui.drawLan()
 end
 
 
-
 function navi_ui.draw()
-    -- Draw background and orbit lines
- --   love.graphics.draw(background)
+ 
     camera:attach()
     navi_ui.drawLan()
     love.graphics.draw(navi_ui.ship.image, navi_ui.ship.x, navi_ui.ship.y)
@@ -762,9 +472,7 @@ function navi_ui.draw()
     love.graphics.setColor(1, 1, 1) -- set color to white
     love.graphics.setBackgroundColor(0.16, 0.16, 0.16) -- dark grey background
 
-    navi_ui.girdMenu(gridX, gridY)
-    -- draw options: 
-    navi_ui.drawOptions()
+
 end
 
 

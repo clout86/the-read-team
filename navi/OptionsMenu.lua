@@ -374,6 +374,21 @@ function OptionsMenu.exitEditingOrGoBack()
     end
 end
 
+function OptionsMenu.getCurrentOptions()
+    local currentOptions = {}
+    for key, option in pairs(ui_option_data.options) do
+        currentOptions[key] = option.value
+    end
+    return currentOptions
+end
+function OptionsMenu.getCurrentState()
+    return CURRENT_STATE
+end
+
+function OptionsMenu.getCurrentOptionData()
+    local currentOptionKey = OptionsMenu.getOptionKeys()[selectedOptionIndex]
+    return ui_option_data.options[currentOptionKey]
+end
 
 
 function OptionsMenu.keypressed(key)

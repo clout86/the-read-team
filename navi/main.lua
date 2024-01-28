@@ -59,19 +59,20 @@ local networkDataFetchInterval = 5 -- Fetch data every 5 seconds
 local focusedIndex = 1 -- Default focus on the first UI element
 -- currentState = "rena"
 
--- set focus state management 
-uiElements = {
-    SHIP = "ship",
-    NAVI = "launcher",
-    NAVI_DETAILS = "navi_details",
-    NAVIGATING_GILMORE = "gilmore",
-    BETTERCAP_DIALOG = "bc_dialog",
-    MSF_DIALOG = "msf_dialog",
-    OPTIONS_MENU = "options_menu",
-    EDIT_OPTION = "edit_option",
-    INPUT_MODE = "input_mode"
-    -- ... other states
-}
+-- -- set focus state management 
+-- uiElements = {
+--     SHIP = "ship",
+--     NAVI = "launcher",
+--     NAVI_DETAILS = "navi_details",
+--     NAVIGATING_GRIMOIRE = "grimoire",
+--     BETTERCAP_DIALOG = "bc_dialog",
+--     MSF_DIALOG = "msf_dialog",
+--     OPTIONS_MENU = "options_menu",
+--     EDIT_OPTION = "edit_option",
+--     INPUT_MODE = "input_mode"
+--     -- ... other states
+-- }
+uiElements = {}
 
 -- Menu and selection variables
 local selectedPlanetIndex = 1 -- Default selected planet index
@@ -306,9 +307,6 @@ function love.draw()
     launcher.draw()
     -- msfMenu.draw()
     Talkies.draw()
-    local gridX = 400
-    local gridY = 400
-    OptionsMenu.drawOptions()
-    GridMenu.drawGrid(gridX, gridY)
+
 
 end
