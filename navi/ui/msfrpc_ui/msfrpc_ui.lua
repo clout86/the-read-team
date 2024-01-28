@@ -31,13 +31,16 @@ function rena.executeModule()
     local token = authenticate(url, username, password)
 
     local selectedItem = GridMenu.getSelectedItem()
-    local module_type = selectedItem.module_type
+    local module_type = OptionsMenu.trim(selectedItem.module_type)
     local module_name = OptionsMenu.trim(selectedItem.full_module_name)
 
     local options = OptionsMenu.getCurrentOptions()
-
+    local module_type = module_type or "exploit"
+    print("module_type", module_type)
     local execution_result = metasploit.module_execute(url, token, module_type, module_name, options)
     print("Execution Result: ", execution_result) -- this should output to messageBox
+
+    for k,v in pairs(execution_result) do print(k,v) end
 end
 
 function rena.updateTalkieMsfOptionDesc()
