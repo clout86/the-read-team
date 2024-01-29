@@ -1,7 +1,7 @@
 
 # Not ready for release. 
 
-a general research project for and inspired by:
+a general research project inspired by:
 https://github.com/notnullgames/pakemon-demos
 
 Planet asset from, really fun stuff! 
