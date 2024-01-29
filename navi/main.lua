@@ -5,13 +5,13 @@ camera = Camera(love.graphics.getWidth() / 2, love.graphics.getHeight() / 2)
 -- custom lua deps
 metasploit = require("lib.metasploit")
 authenticate = require("lib.auth")
--- navi_ui = require("ui.navi_ui.navi_ui")
+navi_ui = require("ui.navi_ui.navi_ui")
 bettercap_ui = require("ui.bettercap_ui.bettercap_ui")
-msfMenu = require("ui.msfMenu.msfMenu")
 
 local GridMenu = require("GridMenu")
 local OptionsMenu = require("OptionsMenu")
 local launcher = require("launcher")
+local interact = require("Interact")
 
 url = "http://localhost:55552/api/1.0"
 username = "pakemon"
@@ -26,11 +26,6 @@ api = require("lib.BettercapAPI"):new("localhost", 8081, "pakemon", "pakemon")
 uiElements = {}
 planets = {}
 
--- local navigationRails = {
---     ["mainMenu"] = { up = nil, down = "optionsMenu", left = nil, right = nil },
---     ["optionsMenu"] = { up = "mainMenu", down = "detailsMenu", left = nil, right = "settingsMenu" },
---     -- Add other UI elements as necessary
--- }
 ------------------
 local useDatabase = false
 local useActive = true
@@ -52,27 +47,8 @@ local maxOptionsOnScreen = 10
 local networkDataTimer = 0
 local networkDataFetchInterval = 5 -- Fetch data every 5 seconds
 
--- inital focus state
--- local uiElements = SHIP
-
 -- Variables to maintain the UI state
 local focusedIndex = 1 -- Default focus on the first UI element
--- currentState = "rena"
-
--- -- set focus state management 
--- uiElements = {
---     SHIP = "ship",
---     NAVI = "launcher",
---     NAVI_DETAILS = "navi_details",
---     NAVIGATING_GRIMOIRE = "grimoire",
---     BETTERCAP_DIALOG = "bc_dialog",
---     MSF_DIALOG = "msf_dialog",
---     OPTIONS_MENU = "options_menu",
---     EDIT_OPTION = "edit_option",
---     INPUT_MODE = "input_mode"
---     -- ... other states
--- }
-uiElements = {}
 
 -- Menu and selection variables
 local selectedPlanetIndex = 1 -- Default selected planet index
@@ -85,6 +61,16 @@ local displayStartIndex = 1
 local maxDisplayCount = 100
 
 local selectedOptionIndex = 1
+
+keysPressed = {}
+
+function love.keypressed(key)
+    keysPressed[key] = true
+end
+
+function love.keyreleased(key)
+    keysPressed[key] = false
+end
 
 -- This function will create a nested table from the given table t
 function walk_table(t, depth)
@@ -118,17 +104,16 @@ function loadModules(directory)
             if love.filesystem.getInfo(modulePath .. ".lua") then
                 print("Loading module:", modulePath) -- Debug print
                 local uiModule = require(modulePath)
-                table.insert(uiElements, uiModule)
+                --  table.insert(uiElements, uiModule)
             end
         end
     end
 end
 
 function love.load()
-    GridMenu.loadGilmore("exploit_names.txt")
+    isLanVisible = true
+    GridMenu.loadGrimoire("exploit_names.txt")
     GridMenu.populateMenuItems()
-
-    msfMenu.load()
 
     launcher.load()
 
@@ -186,7 +171,7 @@ function love.load()
 
     planetInfo = true
     bettercap_ui.showMenu()
-    -- rena.dialog()
+    rena.dialog()
 
 end
 
@@ -209,28 +194,28 @@ function netTimer(dt)
         networkDataTimer = 0 -- Reset the timer
     end
 end
+local FocusStates = {"SHIP_NAVI", "PLANET_NAVI", "OPTIONS_NAVI", "GRID_NAVI", "LAUNCHER", "TALKIES"}
+
+currentFocusStateIndex = 1
+currentFocusState = "SHIP_NAVI"
 
 function love.update(dt)
-  --  msfMenu.update()
+
+
     launcher.update(dt)
     --  DEBUG STUFF
     require("lib.lovebird").update()
+    require("lurker").update()
     --  END DEBUG STUFF
     Talkies.update(dt)
     netTimer(dt)
-    -- ship start of update func
     -- if not music:isPlaying() then
     --     --  love.audio.play( music )
     -- end
     navi_ui.shipDeadzone()
 
-    if love.keyboard.isDown('q') then
-        camera:zoom(1 + 2 * dt) -- Zoom in
-    elseif love.keyboard.isDown('e') then
-        camera:zoom(1 - 2 * dt) -- Zoom out
-    end
 
-    if uiElements == SHIP then
+    if currentFocusStateIndex == 1 then
         if love.keyboard.isDown('up') then
             navi_ui.ship.y = navi_ui.ship.y - navi_ui.ship.speed * dt
         end
@@ -243,7 +228,13 @@ function love.update(dt)
         if love.keyboard.isDown('right') then
             navi_ui.ship.x = navi_ui.ship.x + navi_ui.ship.speed * dt
         end
+        if love.keyboard.isDown('d') then
+            camera:zoom(1 + 2 * dt) -- Zoom in
+        elseif love.keyboard.isDown('c') then
+            camera:zoom(1 - 2 * dt) -- Zoom out
+        end
     end
+
 
     -- if false orbit stops
     if isOrbiting then
@@ -262,51 +253,54 @@ function love.update(dt)
 end
 
 function love.keypressed(key)
-    if key == "space" then
-        Talkies.onAction()
-    elseif key == "up" then
-        Talkies.prevOption()
-    elseif key == "down" then
-        Talkies.nextOption()
-    end
-    -- Navigate between UI elements
-    if key == 'left' then
-        focusedIndex = math.max(1, focusedIndex - 1)
-    elseif key == 'right' then
-        focusedIndex = math.min(#uiElements, focusedIndex + 1)
+    -- Handling state switching
+    if key == 'q' then
+        currentFocusStateIndex = (currentFocusStateIndex - 2) % #FocusStates + 1
+        print("CFSI ", currentFocusStateIndex)
+    elseif key == 'e' then
+        currentFocusStateIndex = currentFocusStateIndex % #FocusStates + 1
+        print("CFSI ", currentFocusStateIndex)
+
     end
 
-    -- Interact with the focused UI element
-    if key == 'tab' then
-        local focusedElement = uiElements[focusedIndex]
-        if focusedElement and focusedElement.interact then
-            focusedElement.interact()
-        end
-    end
+    -- Update the current focus state based on index
+    local currentFocusState = FocusStates[currentFocusStateIndex]
 
-    -- Cancel or go back action
-    if key == 'b' then
-        -- Implement the logic to handle 'back' action
-        -- This might involve changing the game state or closing a menu
+    -- Call the appropriate function from the interact module based on the focus state
+
+    if currentFocusStateIndex == 2 then
+        interact.planetNavigation(key)
+    elseif currentFocusStateIndex == 3 then
+
+       OptionsMenu.optionsNavigation(key)
+    elseif currentFocusStateIndex == 4 then
+        interact.gridNavigation(key)
+    elseif currentFocusStateIndex == 5 then
+        launcher.keypressed(key)
+    elseif currentFocusStateIndex == 6 then
+        if key == 'up' then
+            Talkies.prevOption()
+        elseif key == 'down' then
+            Talkies.nextOption()
+        elseif key == 'a' then
+            Talkies.onAction()
+            currentFocusStateIndex = 3
+           -- pushState(State.NAVIGATING_OPTIONS)
+        elseif key == 'b' then
+            Talkies.clearMessages()
     end
-    launcher.keypressed(key)
+end
 end
 
 -- In your draw function, highlight the focused UI element
 function love.draw()
     love.graphics.draw(background)
 
-    love.graphics.print("HAHA")
-    for i, element in ipairs(uiElements) do
-        if element.draw then
-            element.draw()
-        else
-            print("failed to load " .. uiElements)
-        end
-    end
-    launcher.draw()
-    -- msfMenu.draw()
-    Talkies.draw()
 
+    launcher.draw()
+    navi_ui.draw()
+    Talkies.draw()
+    OptionsMenu.drawOptions()
+    GridMenu.drawGrid(400, 400)
 
 end

@@ -22,6 +22,9 @@ local OPTION_STATE = {
     EDITING_OPTION = "enum_or_bool",
     KEYBOARD_INPUT = "text_input",
 }
+
+local CURRENT_STATE = OPTION_STATE.NAVIGATING_OPTIONS
+
 -----------------------------------------------------------------------------------------------------------------------
 -- Define option handlers for different types within 'options'
 local optionHandler = {
@@ -158,7 +161,7 @@ end
 
 function OptionsMenu.updateTalkiesDialog(title, items) -- ,image)
     -- Use the refactored tableToString function to handle the conversion
-    local content = tableToString(items)
+    local content = OptionsMenu.tableToString(items)
     Talkies.say(title, content, {
         image = renaImage -- image or nil
     })
@@ -176,7 +179,7 @@ function OptionsMenu.tableToString(tbl)
     local str = ""
     for k, v in pairs(tbl) do
         if type(v) == "table" then
-            str = str .. k .. ": {" .. tableToString(v) .. "}, "
+            str = str .. k .. ": {" .. OptionsMenu.tableToString(v) .. "}, "
         else
             str = str .. k .. ": " .. tostring(v) .. ", "
         end
@@ -297,6 +300,7 @@ function OptionsMenu.processMsfModuleInfo(module_info)
 end
 
 
+
 -- Helper Functions
 function OptionsMenu.getOptionKeys()
     local keys = {}
@@ -326,7 +330,7 @@ local module_name = OptionsMenu.trim(selectedItem.full_module_name)
     OptionsMenu.clearOptions()
     OptionsMenu.processMsfModuleInfo(module_info)
 
-    OptionsMenu.walk_table(module_info)
+    -- OptionsMenu.walk_table(module_info)
 
 end
 
@@ -388,73 +392,60 @@ end
 function OptionsMenu.getCurrentOptionData()
     local currentOptionKey = OptionsMenu.getOptionKeys()[selectedOptionIndex]
     return ui_option_data.options[currentOptionKey]
+    
 end
 
 
-function OptionsMenu.keypressed(key)
-    if CURRENT_STATE == OPTION_STATE.NAVIGATING_EXPLOITS then
-        if key == "right" then
-            GridMenu.navigateGirdRight()
-        elseif key == "left" then
-            GridMenu.navigateGridLeft()
-        elseif key == "a" then
-            OptionsMenu.loadModuleInfo()
-            -- showMsfDialog()
-            OptionsMenu.pushState(OPTION_STATE.TALKIES_DIALOGUE)
-        end
 
-    elseif CURRENT_STATE == OPTION_STATE.TALKIES_DIALOGUE then
-        if key == 'up' then
-            Talkies.prevOption()
-        elseif key == 'down' then
-            Talkies.nextOption()
-        elseif key == 'a' then
-            Talkies.onAction()
-        elseif key == 'b' then
-            Talkies.clearMessages()
-            OptionsMenu.popState()
-        end
-    elseif CURRENT_STATE == OPTION_STATE.NAVIGATING_OPTIONS then
-        if key == 'up' then
+    function OptionsMenu.optionsNavigation(key)
+
+        if key == ('up') then
             OptionsMenu.navigateOptionsUp()
-            OptionsMenu.updateTalkieMsfOptionDesc()
+        --    OptionsMenu.clearOptions()
+        --   OptionsMenu.updateTalkieMsfOptionDesc()
 
-        elseif key == 'down' then
-            OptionsMenu.navigateOptionsDown()
-            OptionsMenu.updateTalkieMsfOptionDesc()
-
-        elseif key == 'right' or key == 'a' then
-            OptionsMenu.enterOrConfirmOption()
-        elseif key == 'left' or key == 'b' then
-            OptionsMenu.exitEditingOrGoBack()
         end
-    end
+        if key == ('down') then
+            OptionsMenu.navigateOptionsDown()
+        --    OptionsMenu.clearOptions()
+        --    OptionsMenu.updateTalkieMsfOptionDesc()
 
-end
+        end
+        if key == ('a') then
+            OptionsMenu.toggleOrSelectOption()
+
+        end
+        if key == ('b') then
+            OptionsMenu.exitEditingOrGoBack()
+            -- pop focusState
+        end
+
+    end
 
 
 -- Drawing Functions
 function OptionsMenu.drawOptions()
-    local baseY = 50
+    local baseY = 175
     local optionKeys = OptionsMenu.getOptionKeys()
     for i, optionKey in ipairs(optionKeys) do
         local optionData = ui_option_data.options[optionKey]
         if i > scrollOffset and i <= scrollOffset + maxOptionsOnScreen then
             local y = baseY + (i - scrollOffset - 1) * 20
             -- Drawing logic for options
-            love.graphics.rectangle("line", 50, y, 200, 20)
+            love.graphics.setColor( 0, 0, 0, 0.8 )
+            love.graphics.rectangle("fill", 100, y, 200, 20)
             local displayText = optionKey
-            local optionValue = tostring(optionData.value) or "No description available" -- Corrected line
+            local optionValue = tostring(optionData.value) or "No description available" 
             love.graphics.setColor(0, 255, 0)
-            love.graphics.print(displayText, 60, y)
-            love.graphics.print(optionValue, 255, y) -- Corrected line
+            love.graphics.print(displayText, 110, y)
+            love.graphics.print(optionValue, 305, y) 
 
             -- Highlight selected option
             if i == selectedOptionIndex then
-                love.graphics.setColor(1, 1, 255)
-                love.graphics.rectangle("line", 50, y, 200, 20)
+                love.graphics.setColor(1, 1, 1)
+                love.graphics.rectangle("line", 100, y, 200, 20)
                 if CURRENT_STATE == OPTION_STATE.KEYBOARD_INPUT then
-                    keyboard.draw(255, y - 5) -- should be next to the option or something else
+                    keyboard.draw(305, y - 5) -- should be next to the option or something else
                 end
             end
             if CURRENT_STATE == OPTION_STATE.EDITING_OPTION then
@@ -463,10 +454,9 @@ function OptionsMenu.drawOptions()
                     DropdownMenu.draw() -- Draw the DropdownMenu for enum options
                 end
             end
-            -- If an option is selected, draw its value and description in a dedicated column
+            
 
-            love.graphics.setColor(0, 255, 255)
-            -- ...
+             love.graphics.setColor(1, 1, 1)
         end
     end
 end

@@ -1,22 +1,21 @@
---local OptionsMenu = require("OptionsMenu")
-
-
+-- local OptionsMenu = require("OptionsMenu")
 GridMenu = {}
 
 -- Grid Menu Configuration
-local itemsPerPage = 9
-local currentPage = 1
-local totalPages
 local allExploits = {} -- Store all exploit infos here
 local menuItems = {} -- Items for the current page
+
+local totalPages
+local selectedItem = 1
+local itemsPerPage = 9
+local currentPage = 1
 local rows = 9
 local cols = 3
 local cellWidth = 100
 local cellHeight = 50
-local selectedItem = 1
 
 -- Load exploits from a file
-function GridMenu.loadGilmore(filename)
+function GridMenu.loadGrimoire(filename)
     if love.filesystem.getInfo(filename) then
         for line in love.filesystem.lines(filename) do
             local name, module_type, full_module_name = line:match("([^,]+),([^,]+),([^,]+)")
@@ -43,10 +42,11 @@ function GridMenu.getSelectedItem()
     return menuItems[selectedItem]
 end
 
-
 function GridMenu.getMenuItems()
     print("MENUITEMS ", menuItems)
-    for k,v in pairs(menuItems) do print(k,v)end
+    for k, v in pairs(menuItems) do
+        print(k, v)
+    end
     return menuItems
 end
 
@@ -61,8 +61,6 @@ end
 function GridMenu.hideGrid()
     isGridVisible = false
 end
-
-
 
 -- Grid Navigation Functions
 function GridMenu.navigateGridRight()
@@ -146,8 +144,17 @@ function GridMenu.isItemInCurrentPage(itemIndex, currentPage, itemsPerPage, tota
 end
 
 
+
 -- Grid Drawing Function
-function GridMenu.drawGrid(startX, startY)
+function GridMenu.drawGrid(startX, startY, rows, cols, cellWidth, cellHeight)
+
+    local starX = startX or 400
+    local startY = startY or 400
+    local rows = rows or 9
+    local cols = cols or 3
+    local cellWidth = cellWidth or 100
+    local cellHeight = cellHeight or 50
+
     if not isGridVisible then
         return
     end

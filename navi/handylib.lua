@@ -149,27 +149,42 @@ function handy:callButtonName(name) -- Allows to call a button by its name
     end
 end
 
-function handy:callButtonIndex(index) -- Allows to call a button in the button table
+function handy:callButtonIndex(index)
     print("[navigation] Calling button at index " .. index)
-    -- Converting index to name
-    local buttonName = ""
-    for i in pairs(self.buttons) do
-        if index == 1 then
-            buttonName = i
-            break
+    local counter = 0
+    for name, _ in pairs(self.buttons) do
+        counter = counter + 1
+        if counter == index then
+            print("[navigation] Calling button " .. name)
+            self.buttons[name].callback()
+            return true
         end
-        index = index - 1
     end
-    -- Calling the button if it exists
-    if buttonName ~= "" then
-        print("[navigation] Calling button " .. buttonName)
-        self.buttons[buttonName].callback()
-        return true
-    else
-        print("[navigation] Button not found")
-        return false
-    end
+    print("[navigation] Button not found")
+    return false
 end
+
+-- function handy:callButtonIndex(index) -- Allows to call a button in the button table
+--     print("[navigation] Calling button at index " .. index)
+--     -- Converting index to name
+--     local buttonName = ""
+--     for i in pairs(self.buttons) do
+--         if index == 1 then
+--             buttonName = i
+--             break
+--         end
+--         index = index - 1
+--     end
+--     -- Calling the button if it exists
+--     if buttonName ~= "" then
+--         print("[navigation] Calling button " .. buttonName)
+--         self.buttons[buttonName].callback()
+--         return true
+--     else
+--         print("[navigation] Button not found")
+--         return false
+--     end
+-- end
 
 -- !SECTION Navigation prototypes
 

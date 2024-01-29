@@ -47,43 +47,43 @@ navi_ui.ship = {
     image = nil
 }
 
-function navi_ui.interact(dt)
-    if currentState == uiElements.NAVIGATING_EXPLOITS then
-        if key == "right" then
-            navigateGirdRight()
-        elseif key == "left" then
-            navigateGridLeft()
-        elseif key == "a" then
-            loadModuleInfo()
-            showMsfDialog()
-        end
+-- function navi_ui.interact(dt)
+--     if currentState == uiElements.NAVIGATING_EXPLOITS then
+--         if key == "right" then
+--             navigateGirdRight()
+--         elseif key == "left" then
+--             navigateGridLeft()
+--         elseif key == "a" then
+--             loadModuleInfo()
+--             showMsfDialog()
+--         end
 
-    elseif currentState == uiElements.MSF_DIALOG then
-        if key == 'up' then
-            Talkies.prevOption()
-        elseif key == 'down' then
-            Talkies.nextOption()
-        elseif key == 'a' then
-            Talkies.onAction()
-        elseif key == 'b' then
-            Talkies.clearMessages()
-        end
-    elseif currentState == uiElements.MSF_OPTIONS then
-        if key == 'up' then
-            navigateOptionsUp()
-            updateTalkieMsfOptionDesc()
+--     elseif currentState == uiElements.MSF_DIALOG then
+--         if key == 'up' then
+--             Talkies.prevOption()
+--         elseif key == 'down' then
+--             Talkies.nextOption()
+--         elseif key == 'a' then
+--             Talkies.onAction()
+--         elseif key == 'b' then
+--             Talkies.clearMessages()
+--         end
+--     elseif currentState == uiElements.MSF_OPTIONS then
+--         if key == 'up' then
+--             navigateOptionsUp()
+--             updateTalkieMsfOptionDesc()
 
-        elseif key == 'down' then
-            navigateOptionsDown()
-            updateTalkieMsfOptionDesc()
+--         elseif key == 'down' then
+--             navigateOptionsDown()
+--             updateTalkieMsfOptionDesc()
 
-        elseif key == 'right' or key == 'a' then
-            enterOrConfirmOption()
-        elseif key == 'left' or key == 'b' then
-            exitEditingOrGoBack()
-        end
-    end
-end
+--         elseif key == 'right' or key == 'a' then
+--             enterOrConfirmOption()
+--         elseif key == 'left' or key == 'b' then
+--             exitEditingOrGoBack()
+--         end
+--     end
+-- end
 
 function  navi_ui.fetchLanStructure(api)
     local response = api:request("/api/session/lan", "GET")
