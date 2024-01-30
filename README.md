@@ -49,7 +49,7 @@ if you're not running it on the test net... well somethings are "hard coded" via
 you will need bettercap running as well as msfrpcd avail on port 55552, these could be/should be running the test-net `pakemon` 
 
 
-over-reaching goals of the project; our praxis: 
+over-reaching goals of the project:
 
     User Experience (UX): Make sure that the interface is intuitive. Since the project aims to be accessible, the design should guide the user through processes without overwhelming them with information.
 
