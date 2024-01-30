@@ -43,7 +43,6 @@ Launcher cursor/pointer bug, it always moves no matter the focused state, it onl
 ```
 
 # some general warnings and infos 
-there is also an optional sql-dep that is yanked, that function needs updating anyhow.
 
 if you're not running it on the test net... well somethings are "hard coded" via variables to the docker test-net right now.
 
