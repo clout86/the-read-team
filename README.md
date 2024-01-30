@@ -23,16 +23,23 @@ local mp = require("MessagePack")
 ```
 # To run:
 ``` 
-cd planet_rendor/tools && docker-compose up
-cd ../aTools docker-compose run --services-ports haxor #(on haxor host; run: `sh /app/run_in_haxor.sh
-cd planet_rendor && love .
+run docker attacker tools, set up msfrpcd
+run "regular"  tools for insecure hosts
+run large network docker net for lots of hosts
+
+`cd navi && love .`
 ```
 
 ## Navigation
 ```
-    Press the a key to navigate planets,
-    Up and Down to Navigate
-    Press a for menu, and a to select option
+    "q" and "e" should cycle through input focus of ui elements
+"a" is mostly accept, "b" should be back. 
+
+Directional pads and input work depending on the focus state. 
+
+If you want to interact with the options menu, you have to make sure the FocusStateIndex is set to 3. (option menu is most buggy)
+
+Launcher cursor/pointer bug, it always moves no matter the focused state, it only takes input when focus is indexed at state "5"
 ```
 
 # some general warnings and infos 
@@ -40,7 +47,7 @@ there is also an optional sql-dep that is yanked, that function needs updating a
 
 if you're not running it on the test net... well somethings are "hard coded" via variables to the docker test-net right now.
 
-you will need bettercap running on the testnet as well as metasploit avail on port 55552 locally exposed from the test-net
+you will need bettercap running as well as msfrpcd avail on port 55552, these could be/should be running the test-net `pakemon` 
 
 
 over-reaching goals of the project; our praxis: 
