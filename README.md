@@ -41,6 +41,8 @@ If you want to interact with the options menu, you have to make sure the FocusSt
 
 Launcher cursor/pointer bug, it always moves no matter the focused state, it only takes input when focus is indexed at state "5"
 ```
+### Now with zoom in all states!
+(d) and (c)
 
 # some general warnings and infos 
 
